@@ -1,0 +1,30 @@
+{
+  "name": "4is10-puzzles",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "node --import tsx --test src/game/solver.test.ts"
+  },
+  "dependencies": {
+    "@lucide/vue": "^1.66.0",
+    "@vueuse/core": "^15.0.0",
+    "cuelume": "^0.2.8",
+    "motion-v": "^2.10.0",
+    "vue": "^3.5.44"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "vite": "^8.3.5",
+    "vue-tsc": "^3.3.14"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}
