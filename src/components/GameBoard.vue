@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { motion, AnimatePresence } from 'motion-v'
-import { useEventListener, usePreferredReducedMotion } from '@vueuse/core'
+import { useEventListener, usePreferredReducedMotion, useMediaQuery } from '@vueuse/core'
 import { ArrowRight, Undo2, RotateCcw, Lightbulb, X, Check, Star, Shuffle } from '@lucide/vue'
 import NumberTile from './NumberTile.vue'
 import { display, operations, type Op } from '../game/solver'
@@ -9,10 +9,11 @@ import type { useGame } from '../composables/useGame'
 const { game } = defineProps<{ game: ReturnType<typeof useGame> }>()
 const { mode, level, numbers, tiles, history, selected, operator, clock, activeTile, instruction, hintText, message, won, lost, stars, today } = game
 const reduced = usePreferredReducedMotion()
+const isPhone = useMediaQuery('(max-width: 600px)')
 const help = ref<HTMLDialogElement | null>(null)
 function openHelp() { help.value?.showModal() }
 function closeHelp() { help.value?.close() }
-const title = computed(() => mode.value === 'daily' ? '今天，也向 10 靠近一点。' : mode.value === 'practice' ? '随心玩，不设限。' : level.value < 5 ? '小数字，大可能。' : '换个思路，刚刚好。')
+const title = computed(() => mode.value === 'daily' ? (isPhone.value ? '今天，也凑个十。' : '今天，也向 10 靠近一点。') : mode.value === 'practice' ? '随心玩，不设限。' : level.value < 5 ? '小数字，大可能。' : '换个思路，刚刚好。')
 useEventListener(window, 'keydown', (event: KeyboardEvent) => {
   if (help.value?.open || event.ctrlKey || event.metaKey || event.altKey || (event.target as HTMLElement)?.closest('input, textarea, select')) return
   if (['1', '2', '3', '4'].includes(event.key)) { event.preventDefault(); const tile = tiles.value[Number(event.key) - 1]; if (tile) game.choose(tile.id) }
@@ -38,5 +39,5 @@ useEventListener(window, 'keydown', (event: KeyboardEvent) => {
     <div class="scratchpad"><div class="scratch-title"><span>思路留个脚印</span><span>{{ history.length }} / 3 步</span></div><div class="scratch-lines"><template v-if="history.length"><span v-for="(step, i) in history" :key="i"><small>0{{ i + 1 }}</small>{{ step.line }}<Check :size="13"/></span></template><p v-else>每一次合并，都会记在这里。</p></div></div>
     <div class="board-bottom"><span>原始数字 <b>{{ numbers.join(' · ') }}</b></span><span>按 1–4 选数字 · Z 撤销</span></div>
   </section>
-  <Teleport to="body"><dialog ref="help" class="modal-backdrop" @click.self="closeHelp"><section class="help-modal" role="dialog" aria-modal="true" aria-labelledby="help-title"><button class="modal-close" aria-label="关闭玩法" autofocus @click="closeHelp"><X :size="22"/></button><span class="small-label">HOW TO PLAY</span><h2 id="help-title">四个数字，<br>一个刚好的 10。</h2><ol><li>选一个数字，再选 +、−、× 或 ÷。</li><li>选另一个数字，两个数字就会合并。</li><li>用完四个数字，最后剩下 10 就赢了。</li></ol><div class="help-example">1 + 2 = 3 <ArrowRight :size="16"/> 3 + 3 = 6 <ArrowRight :size="16"/> 6 + 4 = 10</div><p>减法和除法按点击顺序计算。允许分数、负数和重复数字；每块积木只能用一次。合并顺序自然形成括号。</p><p>不用提示获得 ★★★，提示一次 ★★，更多提示 ★。随时撤销，不扣星。</p><button class="next-button" @click="closeHelp">明白了，开玩<ArrowRight :size="18"/></button></section></dialog></Teleport>
+  <Teleport to="body"><dialog ref="help" class="modal-backdrop" aria-labelledby="help-title" @click.self="closeHelp"><section class="help-modal"><button class="modal-close" aria-label="关闭玩法" autofocus @click="closeHelp"><X :size="22"/></button><span class="small-label">HOW TO PLAY</span><h2 id="help-title">四个数字，<br>一个刚好的 10。</h2><ol><li>选一个数字，再选 +、−、× 或 ÷。</li><li>选另一个数字，两个数字就会合并。</li><li>用完四个数字，最后剩下 10 就赢了。</li></ol><div class="help-example">1 + 2 = 3 <ArrowRight :size="16"/> 3 + 3 = 6 <ArrowRight :size="16"/> 6 + 4 = 10</div><p>减法和除法按点击顺序计算。允许分数、负数和重复数字；每块积木只能用一次。合并顺序自然形成括号。</p><p>不用提示获得 ★★★，提示一次 ★★，更多提示 ★。随时撤销，不扣星。</p><button class="next-button" @click="closeHelp">明白了，开玩<ArrowRight :size="18"/></button></section></dialog></Teleport>
 </template>
